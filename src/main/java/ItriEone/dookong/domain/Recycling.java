@@ -18,9 +18,20 @@ public class Recycling {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    private LocalDateTime date;
+    @OneToOne
+    @JoinColumn(name = "POINT_ID")
+    private Point point;
+
     private String mediaUrl;
 
     @Enumerated(EnumType.STRING)
-    private RecyclingStatus recyclingStatus;
+    private RecyclingStatus recyclingStatus; //PENDING, APPROVED, REJECTED
+
+    //== 연관관계 편의 메서드 ==//
+    public void setMember(Member member) {
+        this.member = member;
+        if (!member.getRecyclings().contains(this)) {
+            member.getRecyclings().add(this);
+        }
+    }
 }

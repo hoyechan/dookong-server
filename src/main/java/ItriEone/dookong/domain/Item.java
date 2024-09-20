@@ -16,7 +16,9 @@ public class Item {
     private Long id;
 
     private String name;
-    private String pictureUrl;
     private int requiredPoints;
     private String description;
+
+    private String category;
+    private String pictureUrl;
 }

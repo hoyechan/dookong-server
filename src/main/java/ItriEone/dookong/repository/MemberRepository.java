@@ -1,25 +1,21 @@
 package ItriEone.dookong.repository;
 
 import ItriEone.dookong.domain.Member;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
-public class MemberRepository {
-    @PersistenceContext
-    EntityManager em;
+public interface MemberRepository extends JpaRepository<Member, Long> {
+    Optional<Member> findByusername(String username);
 
-    @Transactional
-    public Long save(Member member){
-        em.persist(member);
-        return member.getId();
-    }
+    Optional<Member> findByEmail(String email);
 
-    public Member findOne(Long id){
-        return em.find(Member.class, id);
-    }
+    @Query("SELECT m FROM Member m LEFT JOIN m.points p ON FUNCTION('MONTH', p.date) = FUNCTION('MONTH', CURRENT_DATE) AND FUNCTION('YEAR', p.date) = FUNCTION('YEAR', CURRENT_DATE) GROUP BY m.id ORDER BY COALESCE(SUM(p.pointValue), 0) DESC")
+    List<Member> findMonthlyRanking();
 
 
 }
