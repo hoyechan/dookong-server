@@ -10,20 +10,26 @@ import com.example.itrieone.dto.purchaseItem.PurchaseItemReadDto;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class RecyclingReadDto {
     private Long recyclingId;
     private MemberReadDto member;
-    private String mediaUrl;
+    private String beforePictureUrl;
+    private String afterPictureUrl;
     private RecyclingStatus recyclingStatus;
+    private LocalDateTime localDateTime;
 
     public static RecyclingReadDto fromEntity(Recycling recycling) {
         return RecyclingReadDto.builder()
                 .recyclingId(recycling.getId())
                 .member(MemberReadDto.fromEntity(recycling.getMember())) // DTO 변환 사용
-                .mediaUrl(recycling.getMediaUrl())
+                .beforePictureUrl(recycling.getBeforePictureUrl())
+                .afterPictureUrl(recycling.getAfterPictureUrl())
                 .recyclingStatus(recycling.getRecyclingStatus())
+                .localDateTime(recycling.getLocalDateTime())
                 .build();
     }
 }

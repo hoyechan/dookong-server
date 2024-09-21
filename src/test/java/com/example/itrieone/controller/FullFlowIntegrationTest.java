@@ -89,7 +89,8 @@ public class FullFlowIntegrationTest {
         // 분리수거 제출
         RecyclingSubmitRequestDto recyclingSubmitRequest = new RecyclingSubmitRequestDto();
         recyclingSubmitRequest.setMemberId(memberId);
-        recyclingSubmitRequest.setMediaUrl("Test Recycling Submission");
+        recyclingSubmitRequest.setBeforePictureUrl("Test Recycling Submission");
+        recyclingSubmitRequest.setAfterPictureUrl("Test Recycling Submission");
 
         ResponseEntity<RecyclingReadDto> recyclingSubmitResponse = restTemplate.postForEntity("/api/recycling/submit", recyclingSubmitRequest, RecyclingReadDto.class);
         assertThat(recyclingSubmitResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -97,7 +98,8 @@ public class FullFlowIntegrationTest {
 
         RecyclingSubmitRequestDto recyclingSubmitRequest2 = new RecyclingSubmitRequestDto();
         recyclingSubmitRequest2.setMemberId(memberId2);
-        recyclingSubmitRequest2.setMediaUrl("Test Recycling Submission");
+        recyclingSubmitRequest2.setBeforePictureUrl("Test Recycling Submission");
+        recyclingSubmitRequest2.setAfterPictureUrl("Test Recycling Submission");
 
         ResponseEntity<RecyclingReadDto> recyclingSubmitResponse2 = restTemplate.postForEntity("/api/recycling/submit", recyclingSubmitRequest2, RecyclingReadDto.class);
         assertThat(recyclingSubmitResponse2.getStatusCode()).isEqualTo(HttpStatus.OK);

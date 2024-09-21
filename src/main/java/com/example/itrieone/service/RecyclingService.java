@@ -36,7 +36,6 @@ public class RecyclingService {
 
         Recycling recycling = recyclingSubmitRequestDto.toEntity();
         member.addRecycling(recycling);
-
         Recycling returnRecycling = recyclingRepository.save(recycling);
 
         return RecyclingReadDto.fromEntity(returnRecycling);

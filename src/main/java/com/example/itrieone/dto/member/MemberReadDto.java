@@ -2,11 +2,15 @@ package com.example.itrieone.dto.member;
 
 import com.example.itrieone.domain.Member;
 import com.example.itrieone.domain.MemberRole;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberReadDto {
     private Long memberId;
     private String username;
@@ -23,6 +27,7 @@ public class MemberReadDto {
                 .username(member.getUsername())
                 .email(member.getEmail())
                 .totalPoint(member.getTotalPoint())
-                .role(member.getRole()).build();
+                .role(member.getRole())
+                .build();
     }
 }
