@@ -24,7 +24,9 @@ public class Recycling {
 //    @JoinColumn(name = "POINT_ID")
 //    private Point point;
 
-    private String mediaUrl;
+    private String beforePictureUrl;
+    private String afterPictureUrl;
+    private LocalDateTime localDateTime;
 
     @Enumerated(EnumType.STRING)
     private RecyclingStatus recyclingStatus; //PENDING, APPROVED, REJECTED

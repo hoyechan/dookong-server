@@ -6,16 +6,21 @@ import com.example.itrieone.domain.RecyclingStatus;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class RecyclingSubmitRequestDto {
     private Long memberId;
-    private String mediaUrl;
+    private String beforePictureUrl;
+    private String afterPictureUrl;
 
     public Recycling toEntity(){
         return Recycling.builder()
-                .mediaUrl(mediaUrl)
+                .beforePictureUrl(beforePictureUrl)
+                .afterPictureUrl(afterPictureUrl)
                 .recyclingStatus(RecyclingStatus.PENDING)
+                .localDateTime(LocalDateTime.now())
                 .build();
     }
 }

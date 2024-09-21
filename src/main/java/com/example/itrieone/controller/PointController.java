@@ -22,7 +22,7 @@ public class PointController {
      * @param memberId
      * @return ResponseEntity<Integer>
      */
-    @GetMapping("/{memberId}/monthly")
+    @GetMapping("/monthly/{memberId}")
     public ResponseEntity<Integer> getMonthlyPoints(@PathVariable Long memberId) {
         int monthlyPoints = pointService.getMonthlyPoints(memberId);
         return ResponseEntity.ok(monthlyPoints);
@@ -33,7 +33,7 @@ public class PointController {
      * @param memberId
      * @return ResponseEntity<Integer>
      */
-    @GetMapping("/{memberId}/monthly-ranking")
+    @GetMapping("/monthly-ranking/{memberId}")
     public ResponseEntity<Integer> getMonthlyOneRanking(@PathVariable Long memberId) {
         int rank = pointService.getMonthlyOneRanking(memberId);
         return ResponseEntity.ok(rank);
@@ -44,7 +44,7 @@ public class PointController {
      * @param memberId
      * @return
      */
-    @GetMapping("/{memberId}/all")
+    @GetMapping("/all/{memberId}")
     public ResponseEntity<List<PointReadDto>> getAllPointsByMember(@PathVariable Long memberId) {
         List<PointReadDto> pointList = pointService.getAllPointsByMember(memberId);
         return ResponseEntity.ok(pointList);
@@ -59,8 +59,5 @@ public class PointController {
         List<MemberReadDto> rankingList = pointService.getAllRanking();
         return ResponseEntity.ok(rankingList);
     }
-
-
-
 }
 
