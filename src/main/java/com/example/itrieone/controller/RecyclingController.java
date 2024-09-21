@@ -1,12 +1,18 @@
 package com.example.itrieone.controller;
 
+import com.example.itrieone.config.MultipartConfig;
+import com.example.itrieone.dto.item.ItemCreateRequestDto;
+import com.example.itrieone.dto.item.ItemReadDto;
 import com.example.itrieone.dto.recycling.RecyclingReadDto;
 import com.example.itrieone.dto.recycling.RecyclingSubmitRequestDto;
 import com.example.itrieone.service.RecyclingService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -18,12 +24,22 @@ public class RecyclingController {
 
     /**
      * 분리수거 등록 API
-     * @param dto 분리수거 등록 요청 DTO
-     * @return 등록된 분리수거 내역 DTO
+     * @param recyclingData
+     * @param beforeImage
+     * @param afterImage
+     * @return
+     * @throws IOException
      */
     @PostMapping("/submit")
-    public ResponseEntity<RecyclingReadDto> submitRecycling(@RequestBody RecyclingSubmitRequestDto dto) {
-        RecyclingReadDto recyclingReadDto = recyclingService.submitRecycling(dto);
+    public ResponseEntity<RecyclingReadDto> submitRecycling(
+            @RequestPart("recyclingData") String recyclingData,
+            @RequestPart("beforeImage")MultipartFile beforeImage,
+            @RequestPart("afterImage")MultipartFile afterImage) throws IOException {
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        RecyclingSubmitRequestDto recyclingSubmitRequestDto = objectMapper.readValue(recyclingData, RecyclingSubmitRequestDto.class);
+
+        RecyclingReadDto recyclingReadDto = recyclingService.submitRecycling(recyclingSubmitRequestDto, beforeImage, afterImage);
         return ResponseEntity.ok(recyclingReadDto);
     }
 
@@ -33,7 +49,7 @@ public class RecyclingController {
      * @return 승인 결과 메시지
      */
     @PostMapping("/approve/{recyclingId}")
-    public ResponseEntity<String> approveRecycling(@PathVariable Long recyclingId) {
+    public ResponseEntity<String> approveRecycling(@PathVariable("recyclingId") Long recyclingId) {
         recyclingService.approveRecycling(recyclingId);
         return ResponseEntity.ok("분리수거 활동이 승인되었습니다.");
     }
@@ -44,7 +60,7 @@ public class RecyclingController {
      * @return 거절 결과 메시지
      */
     @PostMapping("/reject/{recyclingId}")
-    public ResponseEntity<String> rejectRecycling(@PathVariable Long recyclingId) {
+    public ResponseEntity<String> rejectRecycling(@PathVariable("recyclingId") Long recyclingId) {
         recyclingService.rejectRecycling(recyclingId);
         return ResponseEntity.ok("분리수거 활동이 거절되었습니다.");
     }

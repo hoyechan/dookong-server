@@ -99,15 +99,19 @@ public class PointService {
                 .collect(Collectors.toList());
     }
 
+
     /**
-     * 전체 회원의 이번 달 포인트 순위 조회
+     * 전체 회원의 이번 달 포인트 순위 조회 (ADMIN 제외)
      * @return List<MemberReadDto>
      */
     public List<MemberReadDto> getAllRanking() {
         List<Member> monthlyRanking = memberRepository.findMonthlyRanking();
+
         return monthlyRanking.stream()
                 .map(MemberReadDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+
 
 }

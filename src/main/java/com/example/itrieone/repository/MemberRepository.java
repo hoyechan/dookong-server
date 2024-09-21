@@ -10,12 +10,13 @@ import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
+
     Optional<Member> findByusername(String username);
 
     Optional<Member> findByEmail(String email);
 
-    @Query("SELECT m FROM Member m LEFT JOIN m.points p ON FUNCTION('MONTH', p.date) = FUNCTION('MONTH', CURRENT_DATE) AND FUNCTION('YEAR', p.date) = FUNCTION('YEAR', CURRENT_DATE) GROUP BY m.id ORDER BY COALESCE(SUM(p.pointValue), 0) DESC")
+    // ADMIN 역할을 가진 멤버는 제외하고 totalPoint로 내림차순 정렬
+    @Query("SELECT m FROM Member m WHERE m.role <> 'ADMIN' ORDER BY m.totalPoint DESC")
     List<Member> findMonthlyRanking();
-
-
 }
+

@@ -12,13 +12,12 @@ import java.time.LocalDateTime;
 @Setter
 public class RecyclingSubmitRequestDto {
     private Long memberId;
-    private String beforePictureUrl;
-    private String afterPictureUrl;
+
+//    private String beforePictureUrl;
+//    private String afterPictureUrl;
 
     public Recycling toEntity(){
         return Recycling.builder()
-                .beforePictureUrl(beforePictureUrl)
-                .afterPictureUrl(afterPictureUrl)
                 .recyclingStatus(RecyclingStatus.PENDING)
                 .localDateTime(LocalDateTime.now())
                 .build();
