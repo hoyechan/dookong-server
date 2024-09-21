@@ -1,9 +1,8 @@
 package com.example.itrieone.service;
 
-import com.example.itrieone.domain.Member;
-import com.example.itrieone.domain.Point;
-import com.example.itrieone.domain.Recycling;
-import com.example.itrieone.domain.RecyclingStatus;
+import com.example.itrieone.domain.*;
+import com.example.itrieone.dto.item.ItemCreateRequestDto;
+import com.example.itrieone.dto.item.ItemReadDto;
 import com.example.itrieone.dto.recycling.RecyclingReadDto;
 import com.example.itrieone.dto.recycling.RecyclingSubmitRequestDto;
 import com.example.itrieone.repository.MemberRepository;
@@ -12,9 +11,16 @@ import com.example.itrieone.repository.RecyclingRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,14 +37,48 @@ public class RecyclingService {
      * @param recyclingSubmitRequestDto
      * @return
      */
-    public RecyclingReadDto submitRecycling(RecyclingSubmitRequestDto recyclingSubmitRequestDto) {
-        Member member = memberRepository.findById(recyclingSubmitRequestDto.getMemberId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    public RecyclingReadDto submitRecycling(RecyclingSubmitRequestDto recyclingSubmitRequestDto, MultipartFile beforeImage, MultipartFile afterImage) throws IOException{
 
-        Recycling recycling = recyclingSubmitRequestDto.toEntity();
-        member.addRecycling(recycling);
-        Recycling returnRecycling = recyclingRepository.save(recycling);
+        try{
+            String uploadDir = "uploads/";
+            Path uploadPath = Paths.get(uploadDir);
 
-        return RecyclingReadDto.fromEntity(returnRecycling);
+            // uploads 폴더가 없으면 생성
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath); // 폴더가 없으면 생성
+            }
+
+            // 이미지 파일 저장
+            String beforeImageFileName = UUID.randomUUID().toString() + "_" + beforeImage.getOriginalFilename();
+            Path beforeImageFilePath = uploadPath.resolve(beforeImageFileName);
+            Files.copy(beforeImage.getInputStream(), beforeImageFilePath, StandardCopyOption.REPLACE_EXISTING);
+
+            String afterImageFileName = UUID.randomUUID().toString() + "_" + afterImage.getOriginalFilename();
+            Path afterImageFilePath = uploadPath.resolve(afterImageFileName);
+            Files.copy(afterImage.getInputStream(), afterImageFilePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // 파일 저장 후 URL 생성
+            String beforeImageUrl = "/uploads/" + beforeImageFileName;
+            String afterImageUrl = "/uploads/" + afterImageFileName;
+
+            // 생성된 이미지 URL을 recyclingSubmitRequestDto에 설정
+            Recycling recycling = recyclingSubmitRequestDto.toEntity();
+            recycling.setBeforePictureUrl(beforeImageUrl);
+            recycling.setAfterPictureUrl(afterImageUrl);
+
+            //연관관계 설정
+            Member member = memberRepository.findById(recyclingSubmitRequestDto.getMemberId()).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+            member.addRecycling(recycling);
+
+            // Recycling 객체 생성 및 저장
+            Recycling savedRecycling = recyclingRepository.save(recycling);
+
+            return RecyclingReadDto.fromEntity(savedRecycling);
+        }catch(Exception e){
+            System.err.println("예외 발생: " + e.getMessage());
+            e.printStackTrace();
+            throw e;  // 예외를 다시 던져 트랜잭션 롤백 확인
+        }
     }
 
     /**

@@ -48,7 +48,7 @@ public class MemberController {
 
     // 특정 회원 정보 조회
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberReadDto> getMemberById(@PathVariable Long memberId) {
+    public ResponseEntity<MemberReadDto> getMemberById(@PathVariable("memberId") Long memberId) {
         MemberReadDto memberReadDto = memberService.getMemberById(memberId);
         return ResponseEntity.ok(memberReadDto);
     }

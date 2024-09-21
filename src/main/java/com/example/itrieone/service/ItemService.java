@@ -16,10 +16,20 @@ import com.example.itrieone.repository.PurchaseItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,17 +39,48 @@ public class ItemService {
     private final PurchaseItemRepository purchaseItemRepository;
     private final PointRepository pointRepository;
 
+
     /**
      * 아이템 생성(ADMIN만 가능)
      * @param itemCreateRequestDto
      * @return
      */
-    @Transactional
-    public ItemReadDto createItem(ItemCreateRequestDto itemCreateRequestDto) {
+    @Transactional(rollbackFor = Exception.class)
+    public ItemReadDto createItem(ItemCreateRequestDto itemCreateRequestDto, MultipartFile image) throws IOException {
+        try {// 파일을 저장할 경로
+            String uploadDir = "uploads/";
+            Path uploadPath = Paths.get(uploadDir);
 
-        Item item = itemRepository.save(itemCreateRequestDto.toEntity());
-        return ItemReadDto.fromEntity(item);
+            // uploads 폴더가 없으면 생성
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath); // 폴더가 없으면 생성
+            }
+
+            // 이미지 파일 저장
+            String fileName = UUID.randomUUID().toString() + "_" + image.getOriginalFilename();
+            Path filePath = uploadPath.resolve(fileName);
+            Files.copy(image.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            // 파일 저장 후 URL 생성
+            String imageUrl = "/uploads/" + fileName;
+
+            // 생성된 이미지 URL을 itemCreateRequestDto에 설정
+            Item item = itemCreateRequestDto.toEntity();
+            item.setPictureUrl(imageUrl);
+
+            // Item 객체 생성 및 저장
+            Item savedItem = itemRepository.save(item);
+
+            // ItemReadDto로 변환하여 반환
+            return ItemReadDto.fromEntity(savedItem);
+
+        }catch(Exception e){
+            System.err.println("예외 발생: " + e.getMessage());
+            e.printStackTrace();
+            throw e;  // 예외를 다시 던져 트랜잭션 롤백 확인
+        }
     }
+
 
     /**
      * 아이템 구매
@@ -85,6 +126,14 @@ public class ItemService {
         pointRepository.save(point);
 
         return PurchaseItemReadDto.fromEntity(item, member);
+    }
+
+    @Transactional
+    public List<ItemReadDto> getAllItems() {
+        List<Item> items = itemRepository.findAll(); // 모든 아이템 가져오기
+        return items.stream()
+                .map(ItemReadDto::fromEntity) // 각 Item을 ItemReadDto로 변환
+                .collect(Collectors.toList()); // List<ItemReadDto>로 변환
     }
 
 }

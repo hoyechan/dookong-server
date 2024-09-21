@@ -12,7 +12,6 @@ public class ItemCreateRequestDto {
     private String description;
 
     private String category;
-    private String pictureUrl;
 
     public Item toEntity(){
         return Item.builder()
@@ -20,8 +19,6 @@ public class ItemCreateRequestDto {
                 .requiredPoints(requiredPoints)
                 .description(description)
                 .category(category)
-                .pictureUrl(pictureUrl)
                 .build();
-
     }
 }
